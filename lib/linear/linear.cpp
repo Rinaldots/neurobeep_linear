@@ -119,7 +119,7 @@ void LinearCar::runMovement()
 bool LinearCar::isEndstopTriggered() const
 {
     Serial.println("Endstop state: " + String(digitalRead(PIN_ENDSTOP)));
-    return !digitalRead(PIN_ENDSTOP);
+    return digitalRead(PIN_ENDSTOP);
 }
 
 void LinearCar::setTargetStep(long targetSteps)
@@ -138,6 +138,16 @@ void LinearCar::setCommand(Comando value)
 {
     taskENTER_CRITICAL(&stateMux);
     comando = value;
+    taskEXIT_CRITICAL(&stateMux);
+}
+
+void LinearCar::startFollowingLine()
+{
+    taskENTER_CRITICAL(&stateMux);
+    comando = PLAY;
+    if (estado == HOMING || estado == PARADO) {
+        estado = INDO;
+    }
     taskEXIT_CRITICAL(&stateMux);
 }
 

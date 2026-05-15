@@ -92,8 +92,8 @@ class MyCallbacks : public BLECharacteristicCallbacks
         if (rxValue.length() > 0)
         {
             receivedData = rxValue;
-            //if (DEBUG_BLE)
-                //Serial.println("BLE onWrite received: " + rxValue);
+            if (DEBUG_BLE)
+                Serial.println("BLE RX: " + rxValue);
         }
     }
 };
@@ -323,7 +323,7 @@ void BluetoothCommunication::processCommand(String command)
             valueStr = valueStr.substring(0, splitPos);
         }
         float velocity = valueStr.toFloat();
-        linearCar.setSpeed(fabsf(velocity) * 30.0f); // TODO: ajustar o fator de conversão para RPM conforme necessário
+        //linearCar.setSpeed(fabsf(velocity) * 30.0f); // TODO: ajustar o fator de conversão para RPM conforme necessário
         //Serial.println("Comando de velocidade: " + String(velocity));
         if (velocity > 0){
             linearCar.setBypassControl(INDO);
@@ -336,11 +336,22 @@ void BluetoothCommunication::processCommand(String command)
     }
     else if (command == "FOLLOW_LINE_START")
     {
-        linearCar.setCommand(PLAY);
+            if (DEBUG_BLE) Serial.println("Iniciando linha: forçando estado de movimento");
+            linearCar.startFollowingLine();
     }
     else if (command == "FOLLOW_LINE_STOP")
     {
         linearCar.setCommand(STOP);
+    }
+    else if (command == "VOLTA_ZERO")
+    {
+        if (DEBUG_BLE) Serial.println("Comando: Homing");
+        linearCar.requestHoming();
+    }
+    else
+    {
+        if (DEBUG_BLE)
+            Serial.println("Comando desconhecido: " + command);
     }
 }
 

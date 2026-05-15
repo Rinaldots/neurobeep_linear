@@ -45,12 +45,14 @@ void setup() {
 	
 	linearCar.setCommand(STOP);
 	linearCar.requestHoming();
+	linearCar.setSpeed(60.0f); // RPM inicial
 }
 
 void loop() {
 	//static unsigned long last_t = 0;
 	//Serial.println(".");
 	linearCar.step_loop();
+	linearCar.setSpeed(60.0f); // RPM inicial
 	
 	//unsigned long now = micros();
 }

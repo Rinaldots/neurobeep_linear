@@ -38,6 +38,7 @@ public:
     void setTargetStep(long steps);
     void setHomingZeroStep(long value);
     void setCommand(Comando value);
+    void startFollowingLine();
     void setBypassControl(Estado value);
     void requestHoming();
     void setSpeed(float rpm);
@@ -57,7 +58,7 @@ private:
     long homing_zero_step = 0;
 
     long stepDelta = 0;
-    const long limitePassos = 1750;
+    const long limitePassos = 10500;
 
     void handleHoming();
     void updateStateFromCommand();
