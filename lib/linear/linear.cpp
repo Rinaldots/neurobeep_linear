@@ -1,22 +1,25 @@
 #include "linear.h"
 
-namespace {
-float g_motorRpm = static_cast<float>(MOTOR_RPM);
-}
-
 LinearCar::LinearCar()
     : stepper(MOTOR_STEPS, PIN_DIR, PIN_STEP)
 {}
 
 void LinearCar::setup()
 {
-    stepper.begin(g_motorRpm);
+    pinMode(PIN_SLEEP, OUTPUT);
+    digitalWrite(PIN_SLEEP, HIGH);
+    pinMode(PIN_RESET, OUTPUT);
+    digitalWrite(PIN_RESET, HIGH);
+    pinMode(PIN_ENDSTOP, INPUT_PULLUP);
+
+    preferences.begin("linear_car", false);
+    limitePassos = preferences.getLong("limitePassos", 1750);
+    delta        = preferences.getLong("delta", 1);
+    motorRpm     = preferences.getFloat("rpm", MOTOR_RPM);
+
+    stepper.begin(motorRpm);
     stepper.enable();
     stepper.setMicrostep(1);
-
-    pinMode(PIN_SLEEP_RESET, OUTPUT);
-    digitalWrite(PIN_SLEEP_RESET, HIGH);
-    pinMode(PIN_ENDSTOP, INPUT_PULLUP);
 }
 
 void LinearCar::step_loop()
@@ -54,11 +57,11 @@ void LinearCar::handleHoming()
         long zero;
         taskENTER_CRITICAL(&stateMux);
         estado = PARADO;
-        zero = homing_zero_step;
-        steps = zero;
+        zero   = homing_zero_step;
+        steps  = zero;
         taskEXIT_CRITICAL(&stateMux);
 
-        stepper.startMove(-1) ;
+        stepper.startMove(-1);
         Serial.print("Homing completo. Passos definidos para: ");
         Serial.println(zero);
         return;
@@ -72,12 +75,12 @@ void LinearCar::updateStateFromCommand()
 {
     taskENTER_CRITICAL(&stateMux);
     if (comando == PLAY) {
-        if (steps >= (homing_zero_step - 50)) {
+        if (steps >= (homing_zero_step - 50))
             estado = INDO;
-        }
-        if (steps <= (homing_zero_step - limitePassos)) {
+        else if (steps <= (homing_zero_step - limitePassos))
             estado = VOLTANDO;
-        }
+        else
+            estado = lastDirection;
         taskEXIT_CRITICAL(&stateMux);
         return;
     }
@@ -88,9 +91,8 @@ void LinearCar::updateStateFromCommand()
         return;
     }
 
-    if (comando == STOP) {
+    if (comando == STOP)
         estado = PARADO;
-    }
     taskEXIT_CRITICAL(&stateMux);
 }
 
@@ -105,11 +107,13 @@ void LinearCar::runMovement()
         stepper.startMove(-1);
         taskENTER_CRITICAL(&stateMux);
         steps--;
+        lastDirection = INDO;
         taskEXIT_CRITICAL(&stateMux);
     } else if (estadoLocal == VOLTANDO) {
         stepper.startMove(1);
         taskENTER_CRITICAL(&stateMux);
         steps++;
+        lastDirection = VOLTANDO;
         taskEXIT_CRITICAL(&stateMux);
     } else {
         stepper.startMove(0);
@@ -118,13 +122,44 @@ void LinearCar::runMovement()
 
 bool LinearCar::isEndstopTriggered() const
 {
-    Serial.println("Endstop state: " + String(digitalRead(PIN_ENDSTOP)));
     return !digitalRead(PIN_ENDSTOP);
+}
+
+void LinearCar::setLimitePassos(long limite)
+{
+    taskENTER_CRITICAL(&stateMux);
+    limitePassos = limite;
+    taskEXIT_CRITICAL(&stateMux);
+    preferences.putLong("limitePassos", limite);
+}
+
+long LinearCar::getLimitePassos() const
+{
+    taskENTER_CRITICAL(&stateMux);
+    long result = limitePassos;
+    taskEXIT_CRITICAL(&stateMux);
+    return result;
+}
+
+void LinearCar::setDelta(long d)
+{
+    taskENTER_CRITICAL(&stateMux);
+    delta = d;
+    taskEXIT_CRITICAL(&stateMux);
+    preferences.putLong("delta", d);
+}
+
+long LinearCar::getDelta() const
+{
+    taskENTER_CRITICAL(&stateMux);
+    long result = delta;
+    taskEXIT_CRITICAL(&stateMux);
+    return result;
 }
 
 void LinearCar::setTargetStep(long targetSteps)
 {
-    stepper.startMove(targetSteps - stepDelta);
+    stepper.startMove(targetSteps);
 }
 
 void LinearCar::setHomingZeroStep(long value)
@@ -145,26 +180,31 @@ void LinearCar::setBypassControl(Estado value)
 {
     taskENTER_CRITICAL(&stateMux);
     controle = value;
-    comando = BYPASS;
+    comando  = BYPASS;
     taskEXIT_CRITICAL(&stateMux);
 }
 
 void LinearCar::requestHoming()
 {
     taskENTER_CRITICAL(&stateMux);
-    estado = HOMING;
-    comando = BYPASS;
+    estado   = HOMING;
+    comando  = BYPASS;
     controle = PARADO;
     taskEXIT_CRITICAL(&stateMux);
 }
 
 void LinearCar::setSpeed(float rpm)
 {
-    if (rpm < 1.0f) {
+    if (rpm < 1.0f)
         rpm = 1.0f;
-    }
-    g_motorRpm = rpm;
-    stepper.begin(g_motorRpm);
+    motorRpm = rpm;
+    stepper.setRPM(motorRpm);
+    preferences.putFloat("rpm", motorRpm);
+}
+
+float LinearCar::getSpeed() const
+{
+    return motorRpm;
 }
 
 long LinearCar::getSteps() const

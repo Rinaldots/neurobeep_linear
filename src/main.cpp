@@ -1,6 +1,7 @@
 #include <Arduino.h>
 #include <linear.h>
 #include <bluetooth.h>
+#include <web_server.h>
 // Debug timing (set to 1 to enable, 0 to disable)
 #define ENABLE_TIMING 0
 
@@ -12,12 +13,11 @@ TaskHandle_t bleTaskHandle = NULL;
 // Função da task BLE (roda em core separado)
 void bleTask(void* parameter) {
 	const TickType_t xDelay = pdMS_TO_TICKS(10); // 10ms = ~100Hz max rate
-	
+
 	for (;;) {
-		// Atualiza cache de telemetria no contexto da task BLE
-		bluetooth.updateTelemetryCache();
+		// handler() já chama updateTelemetryCache() internamente
 		bluetooth.handler();
-		
+
 		vTaskDelay(xDelay);
 	}
 }
@@ -27,7 +27,7 @@ void setup() {
 	Serial.println("Starting...");
 
 	bluetooth.begin();
-	
+	//setupWebServer();
 	linearCar.setup();
 
 	xTaskCreatePinnedToCore(
@@ -44,6 +44,7 @@ void setup() {
 	Serial.println("Setup complete. BLE task running on Core 0");
 	
 	linearCar.setCommand(STOP);
+	linearCar.setSpeed(60.0f);
 	linearCar.requestHoming();
 }
 
@@ -51,6 +52,6 @@ void loop() {
 	//static unsigned long last_t = 0;
 	//Serial.println(".");
 	linearCar.step_loop();
-	
+	//handleWebServer();
 	//unsigned long now = micros();
 }
