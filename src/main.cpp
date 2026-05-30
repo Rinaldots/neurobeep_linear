@@ -1,7 +1,7 @@
 #include <Arduino.h>
 #include <linear.h>
 #include <bluetooth.h>
-#include <web_server.h>
+//#include <web_server.h>
 // Debug timing (set to 1 to enable, 0 to disable)
 #define ENABLE_TIMING 0
 
@@ -46,12 +46,13 @@ void setup() {
 	linearCar.setCommand(STOP);
 	linearCar.setSpeed(60.0f);
 	linearCar.requestHoming();
+	linearCar.setSpeed(60.0f); // RPM inicial
 }
 
 void loop() {
 	//static unsigned long last_t = 0;
 	//Serial.println(".");
 	linearCar.step_loop();
-	//handleWebServer();
+	
 	//unsigned long now = micros();
 }

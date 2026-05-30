@@ -176,6 +176,16 @@ void LinearCar::setCommand(Comando value)
     taskEXIT_CRITICAL(&stateMux);
 }
 
+void LinearCar::startFollowingLine()
+{
+    taskENTER_CRITICAL(&stateMux);
+    comando = PLAY;
+    if (estado == HOMING || estado == PARADO) {
+        estado = INDO;
+    }
+    taskEXIT_CRITICAL(&stateMux);
+}
+
 void LinearCar::setBypassControl(Estado value)
 {
     taskENTER_CRITICAL(&stateMux);

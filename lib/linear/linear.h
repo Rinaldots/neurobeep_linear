@@ -12,10 +12,10 @@ constexpr int   PIN_STEP    = 19;
 constexpr int   PIN_SLEEP   = 35;
 constexpr int   PIN_RESET   = 36;
 constexpr int   PIN_ENDSTOP = 11;
-constexpr int   STEPS_PER_REV  = 200;
-constexpr int   PULLEY_TEETH   = 16;
-constexpr float BELT_PITCH     = 2.0f;
-constexpr float MM_PER_STEP    = (PULLEY_TEETH * BELT_PITCH) / STEPS_PER_REV;
+constexpr int   STEPS_PER_REV = 200;
+constexpr int   PULLEY_TEETH  = 16;
+constexpr float BELT_PITCH    = 2.0f;
+constexpr float MM_PER_STEP   = (PULLEY_TEETH * BELT_PITCH) / STEPS_PER_REV;
 
 enum Estado  { PARADO, HOMING, INDO, VOLTANDO };
 enum Comando { PLAY, STOP, BYPASS };
@@ -28,6 +28,7 @@ public:
     void  setTargetStep(long targetSteps);
     void  setHomingZeroStep(long value);
     void  setCommand(Comando value);
+    void  startFollowingLine();
     void  setBypassControl(Estado value);
     void  requestHoming();
     void  setSpeed(float rpm);
@@ -40,6 +41,7 @@ public:
     long  getRelativeSteps() const;
     float getRelativePosition() const;
     float getAbsolutePosition() const;
+
 private:
     DRV8825     stepper;
     Preferences preferences;
@@ -59,7 +61,6 @@ private:
     void updateStateFromCommand();
     void runMovement();
     bool isEndstopTriggered() const;
-    
 };
 
 extern LinearCar linearCar;
