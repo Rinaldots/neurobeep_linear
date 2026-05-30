@@ -2,14 +2,14 @@
 #define LINEAR_H
 
 #include <Arduino.h>
-#include <Preferences.h>
 #include "DRV8825.h"
 
 constexpr int   MOTOR_STEPS = 200;
 constexpr int   MOTOR_RPM   = 30;
-constexpr int   PIN_DIR     = 17;
+constexpr int   MOTOR_MICROSTEPS = 1;
+constexpr int   PIN_DIR     = 16;
 constexpr int   PIN_STEP    = 18;
-constexpr int   PIN_SLEEP   = 19;
+constexpr int   PIN_ENABLE   = 17;
 
 constexpr int   PIN_ENDSTOP = 15;
 constexpr int   STEPS_PER_REV = 200;
@@ -41,10 +41,11 @@ public:
     long  getRelativeSteps() const;
     float getRelativePosition() const;
     float getAbsolutePosition() const;
+    void  enableMotor(bool enable);
 
 private:
     DRV8825     stepper;
-    Preferences preferences;
+    // Preferences removed: configuration now managed elsewhere or hardcoded
     mutable portMUX_TYPE stateMux = portMUX_INITIALIZER_UNLOCKED;
 
     Comando comando  = STOP;

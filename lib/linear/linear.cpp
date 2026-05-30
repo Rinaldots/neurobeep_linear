@@ -6,19 +6,13 @@ LinearCar::LinearCar()
 
 void LinearCar::setup()
 {
-    pinMode(PIN_SLEEP, OUTPUT);
-    digitalWrite(PIN_SLEEP, HIGH);
+    pinMode(PIN_ENABLE, OUTPUT);
+    digitalWrite(PIN_ENABLE, LOW);
     
     pinMode(PIN_ENDSTOP, INPUT_PULLUP);
 
-    preferences.begin("linear_car", false);
-    limitePassos = preferences.getLong("limitePassos", 1750);
-    delta        = preferences.getLong("delta", 1);
-    motorRpm     = preferences.getFloat("rpm", MOTOR_RPM);
-
     stepper.begin(motorRpm);
-    stepper.enable();
-    stepper.setMicrostep(1);
+    stepper.setMicrostep(MOTOR_MICROSTEPS);
 }
 
 void LinearCar::step_loop()
@@ -129,7 +123,6 @@ void LinearCar::setLimitePassos(long limite)
     taskENTER_CRITICAL(&stateMux);
     limitePassos = limite;
     taskEXIT_CRITICAL(&stateMux);
-    preferences.putLong("limitePassos", limite);
 }
 
 long LinearCar::getLimitePassos() const
@@ -145,7 +138,6 @@ void LinearCar::setDelta(long d)
     taskENTER_CRITICAL(&stateMux);
     delta = d;
     taskEXIT_CRITICAL(&stateMux);
-    preferences.putLong("delta", d);
 }
 
 long LinearCar::getDelta() const
@@ -208,7 +200,6 @@ void LinearCar::setSpeed(float rpm)
         rpm = 1.0f;
     motorRpm = rpm;
     stepper.setRPM(motorRpm);
-    preferences.putFloat("rpm", motorRpm);
 }
 
 float LinearCar::getSpeed() const
@@ -240,4 +231,9 @@ float LinearCar::getRelativePosition() const
 float LinearCar::getAbsolutePosition() const
 {
     return static_cast<float>(getSteps()) * MM_PER_STEP;
+}
+
+void LinearCar::enableMotor(bool enable)
+{
+    digitalWrite(PIN_ENABLE, !enable);
 }

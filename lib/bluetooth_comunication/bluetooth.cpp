@@ -82,8 +82,8 @@ void BluetoothCommunication::updateTelemetryCache() {
     telemetry_data.right_gain = 0;
 
     telemetry_data.odom_x = linearCar.getSteps(); // passo real
-    telemetry_data.odom_y = linearCar.getAbsolutePosition(); // posição real em mm,
-    telemetry_data.odom_theta = linearCar.getRelativePosition(); 
+    telemetry_data.odom_y = linearCar.getAbsolutePosition(); // posiçao absoluta em mm,
+    telemetry_data.odom_theta = linearCar.getRelativePosition(); // posiçao relativa em mm, considerando o ponto de homing como zero
 
     telemetry_data.odom_vx    = 0;
     telemetry_data.odom_vy    = 0;
