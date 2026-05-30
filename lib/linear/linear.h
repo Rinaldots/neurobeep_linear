@@ -52,7 +52,7 @@ private:
     Estado  controle = PARADO;
     long    steps    = 0;
     long    homing_zero_step = 0;
-    long    limitePassos     = 1750;
+    long    limitePassos     = 5000;
     long    delta            = 1;
     float   motorRpm         = static_cast<float>(MOTOR_RPM);
     Estado  lastDirection    = INDO;
