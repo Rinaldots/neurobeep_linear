@@ -8,8 +8,7 @@ void LinearCar::setup()
 {
     pinMode(PIN_SLEEP, OUTPUT);
     digitalWrite(PIN_SLEEP, HIGH);
-    pinMode(PIN_RESET, OUTPUT);
-    digitalWrite(PIN_RESET, HIGH);
+    
     pinMode(PIN_ENDSTOP, INPUT_PULLUP);
 
     preferences.begin("linear_car", false);

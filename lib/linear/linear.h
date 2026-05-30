@@ -8,10 +8,10 @@
 constexpr int   MOTOR_STEPS = 200;
 constexpr int   MOTOR_RPM   = 30;
 constexpr int   PIN_DIR     = 17;
-constexpr int   PIN_STEP    = 19;
-constexpr int   PIN_SLEEP   = 35;
-constexpr int   PIN_RESET   = 36;
-constexpr int   PIN_ENDSTOP = 11;
+constexpr int   PIN_STEP    = 18;
+constexpr int   PIN_SLEEP   = 19;
+
+constexpr int   PIN_ENDSTOP = 15;
 constexpr int   STEPS_PER_REV = 200;
 constexpr int   PULLEY_TEETH  = 16;
 constexpr float BELT_PITCH    = 2.0f;
