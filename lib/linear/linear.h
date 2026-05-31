@@ -42,6 +42,7 @@ public:
     float getRelativePosition() const;
     float getAbsolutePosition() const;
     void  enableMotor(bool enable);
+    Estado getState() const;
 
 private:
     DRV8825     stepper;
@@ -53,7 +54,7 @@ private:
     Estado  controle = PARADO;
     long    steps    = 0;
     long    homing_zero_step = 0;
-    long    limitePassos     = 5000;
+    long    limitePassos     = 8300;
     long    delta            = 1;
     float   motorRpm         = static_cast<float>(MOTOR_RPM);
     Estado  lastDirection    = INDO;

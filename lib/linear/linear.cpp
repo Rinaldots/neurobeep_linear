@@ -55,12 +55,14 @@ void LinearCar::handleHoming()
         taskEXIT_CRITICAL(&stateMux);
 
         stepper.startMove(-1);
+        
         Serial.print("Homing completo. Passos definidos para: ");
         Serial.println(zero);
         return;
     }
 
     stepper.startMove(1);
+    steps++;
     stepper.nextAction();
 }
 
@@ -114,8 +116,8 @@ void LinearCar::runMovement()
 }
 
 bool LinearCar::isEndstopTriggered() const
-{
-    return !digitalRead(PIN_ENDSTOP);
+{   
+    return digitalRead(PIN_ENDSTOP);
 }
 
 void LinearCar::setLimitePassos(long limite)
@@ -236,4 +238,12 @@ float LinearCar::getAbsolutePosition() const
 void LinearCar::enableMotor(bool enable)
 {
     digitalWrite(PIN_ENABLE, !enable);
+}
+
+Estado LinearCar::getState() const
+{
+    taskENTER_CRITICAL(&stateMux);
+    Estado current = estado;
+    taskEXIT_CRITICAL(&stateMux);
+    return current;
 }

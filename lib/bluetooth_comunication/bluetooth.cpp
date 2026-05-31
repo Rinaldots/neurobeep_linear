@@ -78,7 +78,7 @@ void BluetoothCommunication::updateTelemetryCache() {
     telemetry_data.right_velocity_target = 0;
     telemetry_data.left_motor_pwm  = 0;
     telemetry_data.right_motor_pwm = 0;
-    telemetry_data.left_gain  = 0;
+    telemetry_data.left_gain  = static_cast<float>(linearCar.getState()); // 0=PARADO 1=HOMING 2=INDO 3=VOLTANDO
     telemetry_data.right_gain = 0;
 
     telemetry_data.odom_x = linearCar.getSteps(); // passo real
